@@ -81,7 +81,7 @@ export default function App() {
 
         {/* footer credit เล็กๆ */}
         <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center text-center text-xs font-semibold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.9)] text-xs opacity-80">
-         <div>美琳，我爱你 ❤️</div>
+         <div> 梅林，我爱你 ❤️</div>
          <div>KN.ENGR TU2025 | คณะกรรมการนักศึกษาคณะวิศวกรรมศาสตร์ </div>
           
         </div>
