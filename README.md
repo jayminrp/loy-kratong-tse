@@ -1,16 +1,67 @@
-# React + Vite
+# Loy Kratong Demo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend for Loy Kratong (ลอยกระทง) Online application.
 
-Currently, two official plugins are available:
+## Setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Install Dependencies
 
-## React Compiler
+```bash
+npm install
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Environment Variables
 
-## Expanding the ESLint configuration
+The app is configured to use the production backend API by default:
+- **Production Backend**: `https://loy-kratong-api.onrender.com`
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+For local development, create a `.env` file:
+
+```env
+VITE_API_URL=http://localhost:8000
+```
+
+### Run Development Server
+
+```bash
+npm run dev
+```
+
+The app will be available at: `http://localhost:5173`
+
+### Build for Production
+
+```bash
+npm run build
+```
+
+## Deployment on Render
+
+1. **Environment Variables**: Set `VITE_API_URL` if you want to override the default:
+   ```
+   VITE_API_URL=https://loy-kratong-api.onrender.com
+   ```
+
+2. **Build Command**:
+   ```
+   npm install && npm run build
+   ```
+
+3. **Start Command**:
+   ```
+   npm run preview
+   ```
+   Or use a static file server like `npx serve -s dist`
+
+## API Connection
+
+The frontend connects to the backend API at:
+- **Backend URL**: `https://loy-kratong-api.onrender.com`
+- **Endpoints**:
+  - `GET /kratong` - Get all kratongs
+  - `POST /kratong` - Create a new kratong
+  - `GET /health` - Health check
+
+## Frontend URL
+
+- **Production**: `https://loy-kratong-tse.onrender.com`
