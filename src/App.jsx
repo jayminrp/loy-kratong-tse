@@ -5,21 +5,47 @@ import { loadKratongs, saveKratong } from "./utils/storage";
 import "./index.css";
 
 export default function App() {
-  const [kratongs, setKratongs] = useState(() => loadKratongs());
+  const [kratongs, setKratongs] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // refresh ทุก 5 วิ เพื่อดึงข้อมูลล่าสุด
+  // Load kratongs on mount and refresh every 5 seconds
   useEffect(() => {
-    const interval = setInterval(() => {
-      const latest = loadKratongs();
-      setKratongs(latest);
-    }, 1000);
+    async function loadData() {
+      try {
+        const data = await loadKratongs();
+        setKratongs(data);
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Failed to load kratongs', err);
+        setIsLoading(false);
+      }
+    }
+
+    loadData();
+
+    // refresh ทุก 5 วิ เพื่อดึงข้อมูลล่าสุด
+    const interval = setInterval(async () => {
+      try {
+        const latest = await loadKratongs();
+        setKratongs(latest);
+      } catch (err) {
+        console.error('Failed to refresh kratongs', err);
+      }
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  function handleCreate(newKratong) {
-    const updated = saveKratong(newKratong);
-    setKratongs(updated);
+  async function handleCreate(newKratong) {
+    try {
+      const updated = await saveKratong(newKratong);
+      setKratongs(updated);
+    } catch (err) {
+      console.error('Failed to create kratong', err);
+      // Still update UI even if API call fails (fallback to localStorage)
+      const updated = await loadKratongs();
+      setKratongs(updated);
+    }
   }
 
   return (
