@@ -64,9 +64,21 @@ export default function App() {
 
         {/* render กระทงทุกใบ */}
         <div className="absolute inset-0 pointer-events-none" style={{ fontFamily: "'Kanit', sans-serif" }}>
-          {kratongs.map((k, idx) => (
-            <FloatingKratong key={k.id} kratong={k} index={idx} />
-          ))}
+          {(() => {
+            const total = kratongs.length;
+            // กำหนดแถบน้ำ (จากขอบล่างขึ้นบน) เพื่อไม่ให้ลอยสูงเกินพื้นหลัง
+            const WATER_MIN_BOTTOM = 60;    // ต่ำสุดจากก้นจอ
+            const WATER_MAX_BOTTOM = 360;   // สูงสุดจากก้นจอ (อย่าเกินนี้)
+            const usable = Math.max(1, WATER_MAX_BOTTOM - WATER_MIN_BOTTOM);
+            const step = Math.floor(usable / Math.max(1, total));
+            const half = Math.floor(step / 2);
+            return kratongs.map((k, idx) => {
+              const baseY = WATER_MIN_BOTTOM + idx * step + half;
+              return (
+                <FloatingKratong key={k.id} kratong={k} index={idx} baseY={baseY} />
+              );
+            });
+          })()}
 
           {/* ปุ่มสร้างกระทง — ย้ายมาอยู่กลางล่าง (เหนือ footer) */}
           <div className="absolute left-0 right-0 bottom-20 flex items-center justify-center pointer-events-none">

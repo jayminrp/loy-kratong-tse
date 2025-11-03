@@ -1,29 +1,51 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-export default function FloatingKratong({ kratong, index }) {
-  // ความสูงจากขอบล่างของฉาก
-  const baseY = 60 + (index % 5) * 80;
+export default function FloatingKratong({ kratong, index, baseY }) {
+  // ขนาดฉากอิงที่ 1920px กว้าง (พอประมาณเมื่อ responsive)
+  const SCENE_WIDTH = 1920;
+  const START_LEFT = -200; // เริ่มนอกซ้ายเล็กน้อย
+  const END_RIGHT = SCENE_WIDTH + 280; // เลยขวาเล็กน้อย (รวมเงา)
+  const SPEED_PX_PER_SEC = 60; // ความเร็วคงที่ เพื่อไม่ให้ชนกันขณะ X ทับ
 
-  // random-ish เพื่อไม่ให้กระทงทั้งหมด sync กัน
-  const floatDelay = `${(index % 7) * 0.5}s`;
-  const driftDuration = `${20 + (index % 5) * 30}s`; // 20s, 23s, 26s,...
-  const ageMs = Date.now() - (kratong.createdAt ?? 0);
-  const isNew = ageMs < 3000; // ถือว่า 'ใหม่' ถ้าน้อยกว่า 3 วินาที
+  // หน่วงการโคลงขึ้นลง
+  const floatDelaySec = (index % 7) * 0.5;
+
+  const [x, setX] = useState(() => START_LEFT - (index % 10) * 60);
+  const offsetAccRef = useRef(0);
+  const lastTsRef = useRef(0);
+
+  useEffect(() => {
+    let rafId;
+    const loop = (ts) => {
+      if (!lastTsRef.current) lastTsRef.current = ts;
+      const dtSec = (ts - lastTsRef.current) / 1000;
+      lastTsRef.current = ts;
+
+      setX((prev) => {
+        const next = prev + SPEED_PX_PER_SEC * dtSec;
+        if (next > END_RIGHT) {
+          // วนกลับพร้อมสุ่มบวกแกน X (+20 แบบสุ่มเพื่อไม่ซ้ำ)
+          const add = 20 + Math.floor(Math.random() * 40); // 20..60
+          offsetAccRef.current = (offsetAccRef.current + add) % 320; // จำกัดช่วงสะสม
+          return START_LEFT - offsetAccRef.current;
+        }
+        return next;
+      });
+
+      rafId = requestAnimationFrame(loop);
+    };
+    rafId = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(rafId);
+  }, []);
 
   return (
-    // ชั้นนอก = เคลื่อนที่ทางขวา
     <div
       className="absolute pointer-events-none"
       style={{
         bottom: `${baseY}px`,
         left: 0,
-
-        animationName: "drift-right",
-        animationDuration: driftDuration,
-        animationTimingFunction: "linear",
-        animationIterationCount: "infinite",
-        animationDelay: isNew? "0" : floatDelay,
-        animationFillMode: "forwards",
+        transform: `translateX(${x}px)`,
+        willChange: "transform",
       }}
     >
       {/* ชั้นใน = โยกขึ้นลง */}
@@ -33,7 +55,7 @@ export default function FloatingKratong({ kratong, index }) {
           animationDuration: "2s",
           animationTimingFunction: "ease-in-out",
           animationIterationCount: "infinite",
-          animationDelay: floatDelay,
+          animationDelay: `${floatDelaySec}s`,
           animationFillMode: "forwards",
         }}
       >
